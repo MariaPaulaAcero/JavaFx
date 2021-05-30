@@ -9,12 +9,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import sample.logic.PersonaException;
 import sample.logic.entities.Persona;
+import sample.logic.entities.ProfessionEnum;
 import sample.logic.services.IPersonaServices;
 import sample.logic.services.impl.PersonaService;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,8 +29,12 @@ public class BasicScene extends Application {
     private TextField nameInput;
     private TextField lastNameInput;
     private TextField ageInput;
+    private TextField professionInput;
+    private TextField isVictimInput;
+
     private Button addPersona;
     private Button deletePersona;
+    private Button openReport;
 
     // Menu
     private MenuBar menuBar;
@@ -36,24 +43,25 @@ public class BasicScene extends Application {
     // Logic Properties
     private IPersonaServices personaServices;
 
+
     //CRUD -
     @Override
     public void start(Stage primaryStage) throws Exception {
 
         setUp();
-        behavior();
+        behavior(primaryStage);
 
         primaryStage.setTitle("Sabana Example");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void behavior() {
+    private void behavior(Stage stage) {
         this.personaServices = new PersonaService();
         try {
-            this.personaServices.insert(new Persona("Diego", "Prieto", "25"));
-            this.personaServices.insert(new Persona("Maria", "Rdriguez", "12"));
-            this.personaServices.insert(new Persona("Carlos", "Henao", "100"));
+            this.personaServices.insert(new Persona("Diego", "Prieto", "25", ProfessionEnum.LAWYER, false));
+            this.personaServices.insert(new Persona("Maria", "Rdriguez", "12",ProfessionEnum.POLICE, false));
+            this.personaServices.insert(new Persona("Carlos", "Henao", "100", ProfessionEnum.UNEMPLOYED, true));
         } catch (PersonaException e) {
             e.printStackTrace();
         }
@@ -67,6 +75,8 @@ public class BasicScene extends Application {
                 nameInput.clear();
                 lastNameInput.clear();
                 ageInput.clear();
+                professionInput.clear();
+                isVictimInput.clear();
             } catch (PersonaException personaException) {
                 personaException.printStackTrace();
             }
@@ -84,6 +94,25 @@ public class BasicScene extends Application {
                 exception.printStackTrace();
             }
         });
+        fileMenuItems.get("Import").setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select personas file");
+            File file = fileChooser.showOpenDialog(stage);
+            if (file == null) {
+                System.out.println("No file");
+            } else {
+                try {
+                    this.personaServices.importPersonas(file);
+                    this.personaServices.getAll().stream().forEach(p -> System.out.println(p));
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+
+        openReport.setOnAction(e -> {
+            new ReportScene();
+        });
     }
 
     private void setUp() {
@@ -95,7 +124,7 @@ public class BasicScene extends Application {
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(10, 10, 10, 10));
         hBox.setSpacing(10);
-        hBox.getChildren().addAll(nameInput, lastNameInput, ageInput, addPersona, deletePersona);
+        hBox.getChildren().addAll(nameInput, lastNameInput, ageInput, addPersona, deletePersona, openReport);
 
         //Layout
         VBox layout = new VBox(10);
@@ -115,6 +144,9 @@ public class BasicScene extends Application {
 
         deletePersona = new Button("Delete");
         deletePersona.setMinWidth(30);
+
+        openReport = new Button("Open Report");
+        openReport.setMinWidth(90);
     }
 
     private void setupInputs() {

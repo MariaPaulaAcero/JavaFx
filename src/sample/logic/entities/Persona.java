@@ -5,29 +5,40 @@ import sample.logic.PersonaException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Persona extends Exportable implements Serializable {//para que java pueda guardar objetos en archivos
     // necesita implementar la interfaz de serializable(input output) (voy a poder convertir la representacion
     // en memoria )como un objeto binario en un objeto serializable que se pueda escribir en algún
     // tipo de fuente en este caso en un archivo , base de dato
 
-    //private UUID id;
+    private UUID id;
     private String name;
     private String lastName;
     private int age;
+    private Enum profession;
+    private boolean isVictim;
+
+    public Persona(String name, String lastName, String age, Enum profession, boolean isVictim) throws PersonaException {
+        this.name = name;
+        this.lastName = lastName;
+        this.profession = profession;
+        this.isVictim = isVictim;
+        // this.id = UUID.randomUUID();
+        this.setAge(age);
+    }
 
     public Persona(String name, String lastName, String age) throws PersonaException {
         this.name = name;
         this.lastName = lastName;
         // this.id = UUID.randomUUID();
         this.setAge(age);
+
     }
 
-   /* public UUID getId() {
+    public UUID getId() {
         return id;
     }
-
-    */
 
     public String getName() {
         return name;
@@ -52,6 +63,19 @@ public class Persona extends Exportable implements Serializable {//para que java
 
     public String getAge() {
         return "The age is " + this.age;
+    }
+    public Enum getProfession() {
+        return profession;
+    }
+
+    public boolean isVictim() {
+        return isVictim;
+    }
+
+
+    @Override
+    public String toString(){
+        return String.format("Name = %s, LastName = %s, Age = %s",this.name, this.lastName, this.age);
     }
 
 
